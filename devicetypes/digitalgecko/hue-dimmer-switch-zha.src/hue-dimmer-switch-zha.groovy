@@ -24,6 +24,8 @@ metadata {
         fingerprint profileId: "0104", endpointId: "02", application:"02", outClusters: "0019", inClusters: "0000,0001,0003,000F,FC00", manufacturer: "Philips", model: "RWL020", deviceJoinName: "Hue Dimmer Switch (ZHA)"
 
 		attribute "lastAction", "string"
+		attribute "hueStatus", "string"
+		attribute "heldTime","string"
 	}
 
 
@@ -192,6 +194,9 @@ private Map getButtonResult(rawValue) {
                     log.error "Button: " + button + "  Hue Code: " + hueStatus + "  Hold Time: " + buttonHoldTime
                     result.data = ['buttonNumber': button]
                     result.value = 'pushed'
+
+                    sendEvent(name: "hueStatus", value: hueStatus)
+                    sendEvent(name: "holdTime", value: holdTime)
                     
                     if ( buttonState == 2 ) {
                      result = createEvent(name: "button", value: "pushed", data: [buttonNumber: button], descriptionText: "$device.displayName button $button was pushed", isStateChange: true)
@@ -199,7 +204,7 @@ private Map getButtonResult(rawValue) {
 
 					}
                     
-                    if ( buttonState == 3 ) {
+                    else if ( buttonState == 3 ) {
                      result = createEvent(name: "button", value: "held", data: [buttonNumber: button], descriptionText: "$device.displayName button $button was held", isStateChange: true)
                                          sendEvent(name: "lastAction", value: button + " held")
 					}
